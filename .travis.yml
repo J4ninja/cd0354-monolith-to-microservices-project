@@ -13,6 +13,7 @@ jobs:
   include:
     - stage: build
       script:
+        - docker --version
         - docker-compose -f docker-compose-build.yaml build --parallel
 
     - stage: deploy
