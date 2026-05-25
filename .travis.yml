@@ -4,17 +4,28 @@ node_js:
 
 services:
   - docker
-  
-script: 
-  - docker-compose -f docker-compose-build.yaml build --parallel
-  - docker tag udagram-api-feed ${DOCKER_USERNAME}/udagram-api-feed
-  - docker tag udagram-api-user ${DOCKER_USERNAME}/udagram-api-user
-  - docker tag udagram-frontend:local ${DOCKER_USERNAME}/udagram-frontend
-  - docker tag reverseproxy ${DOCKER_USERNAME}/reverseproxy
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push ${DOCKER_USERNAME}/udagram-api-feed
-  - docker push ${DOCKER_USERNAME}/udagram-api-user
-  - docker push ${DOCKER_USERNAME}/udagram-frontend
-  - docker push ${DOCKER_USERNAME}/reverseproxy
+
+stages:
+  - build
+  - deploy
+
+jobs:
+  include:
+    - stage: build
+      script:
+        - docker-compose -f docker-compose-build.yaml build --parallel
+
+    - stage: deploy
+      if: branch = main
+      script:
+        - docker tag udagram-api-feed ${DOCKER_USERNAME}/udagram-api-feed
+        - docker tag udagram-api-user ${DOCKER_USERNAME}/udagram-api-user
+        - docker tag udagram-frontend:local ${DOCKER_USERNAME}/udagram-frontend
+        - docker tag reverseproxy ${DOCKER_USERNAME}/reverseproxy
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push ${DOCKER_USERNAME}/udagram-api-feed
+        - docker push ${DOCKER_USERNAME}/udagram-api-user
+        - docker push ${DOCKER_USERNAME}/udagram-frontend
+        - docker push ${DOCKER_USERNAME}/reverseproxy
 
 
