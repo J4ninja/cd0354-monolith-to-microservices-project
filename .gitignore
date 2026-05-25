@@ -42,3 +42,6 @@ venv/
 !.elasticbeanstalk/*.global.yml
 set_env.sh
 .angular
+
+env-secret.yaml
+aws-secret.yaml
