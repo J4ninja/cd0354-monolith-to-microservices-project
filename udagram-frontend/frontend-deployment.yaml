@@ -19,3 +19,9 @@ spec:
         image: j4nguyen134/udagram-frontend
         ports:
         - containerPort: 80
+        env:
+        - name: URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: URL

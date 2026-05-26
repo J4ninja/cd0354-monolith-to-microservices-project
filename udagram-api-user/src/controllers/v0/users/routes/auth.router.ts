@@ -9,6 +9,7 @@ import {NextFunction} from 'connect';
 
 import * as EmailValidator from 'email-validator';
 import {config} from 'bluebird';
+import {logger} from '../../../../logger';
 
 const router: Router = Router();
 
@@ -57,25 +58,32 @@ router.post('/login', async (req: Request, res: Response) => {
   const password = req.body.password;
 
   if (!email || !EmailValidator.validate(email)) {
+    logger.warn('Login failed — invalid email format', { email });
     return res.status(400).send({auth: false, message: 'Email is required or malformed.'});
   }
 
   if (!password) {
+    logger.warn('Login failed — missing password', { email });
     return res.status(400).send({auth: false, message: 'Password is required.'});
   }
 
+  logger.info('Login attempt', { email });
+
   const user = await User.findByPk(email);
   if (!user) {
+    logger.warn('Login failed — user not found', { email });
     return res.status(401).send({auth: false, message: 'User was not found..'});
   }
 
   const authValid = await comparePasswords(password, user.passwordHash);
 
   if (!authValid) {
+    logger.warn('Login failed — incorrect password', { email });
     return res.status(401).send({auth: false, message: 'Password was invalid.'});
   }
 
   const jwt = generateJWT(user);
+  logger.info('Login successful', { email });
 
   res.status(200).send({auth: true, token: jwt, user: user.short()});
 });
@@ -86,15 +94,20 @@ router.post('/', async (req: Request, res: Response) => {
   const plainTextPassword = req.body.password;
 
   if (!email || !EmailValidator.validate(email)) {
+    logger.warn('Registration failed — invalid email format', { email });
     return res.status(400).send({auth: false, message: 'Email is missing or malformed.'});
   }
 
   if (!plainTextPassword) {
+    logger.warn('Registration failed — missing password', { email });
     return res.status(400).send({auth: false, message: 'Password is required.'});
   }
 
+  logger.info('Registration attempt', { email });
+
   const user = await User.findByPk(email);
   if (user) {
+    logger.warn('Registration failed — user already exists', { email });
     return res.status(422).send({auth: false, message: 'User already exists.'});
   }
 
@@ -106,7 +119,7 @@ router.post('/', async (req: Request, res: Response) => {
   });
 
   const savedUser = await newUser.save();
-
+  logger.info('Registration successful — new account created', { email });
 
   const jwt = generateJWT(savedUser);
   res.status(201).send({token: jwt, user: savedUser.short()});
