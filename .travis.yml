@@ -3,28 +3,34 @@ language: minimal
 services:
   - docker
 
-stages:
-  - build
-  - deploy
+script:
+  - echo "Travis CI is running successfully!"
+  - docker --version
+  - echo "Docker username is set to $DOCKER_USERNAME"
 
-jobs:
-  include:
-    - stage: build
-      script:
-        - docker --version
-        - docker-compose -f docker-compose-build.yaml build
-
-    - stage: deploy
-      if: branch = main
-      script:
-        - docker tag udagram-api-feed ${DOCKER_USERNAME}/udagram-api-feed
-        - docker tag udagram-api-user ${DOCKER_USERNAME}/udagram-api-user
-        - docker tag udagram-frontend:local ${DOCKER_USERNAME}/udagram-frontend
-        - docker tag reverseproxy ${DOCKER_USERNAME}/reverseproxy
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push ${DOCKER_USERNAME}/udagram-api-feed
-        - docker push ${DOCKER_USERNAME}/udagram-api-user
-        - docker push ${DOCKER_USERNAME}/udagram-frontend
-        - docker push ${DOCKER_USERNAME}/reverseproxy
+# Original script commented out below:
+# stages:
+#   - build
+#   - deploy
+# 
+# jobs:
+#   include:
+#     - stage: build
+#       script:
+#         - docker --version
+#         - docker-compose -f docker-compose-build.yaml build
+# 
+#     - stage: deploy
+#       if: branch = main
+#       script:
+#         - docker tag udagram-api-feed ${DOCKER_USERNAME}/udagram-api-feed
+#         - docker tag udagram-api-user ${DOCKER_USERNAME}/udagram-api-user
+#         - docker tag udagram-frontend:local ${DOCKER_USERNAME}/udagram-frontend
+#         - docker tag reverseproxy ${DOCKER_USERNAME}/reverseproxy
+#         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#         - docker push ${DOCKER_USERNAME}/udagram-api-feed
+#         - docker push ${DOCKER_USERNAME}/udagram-api-user
+#         - docker push ${DOCKER_USERNAME}/udagram-frontend
+#         - docker push ${DOCKER_USERNAME}/reverseproxy
 
 
