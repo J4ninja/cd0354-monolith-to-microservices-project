@@ -20,6 +20,12 @@ import {V0_FEED_MODELS} from './controllers/v0/model.index';
 
   app.use(bodyParser.json());
 
+  // Simple logging middleware for incoming requests
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    next();
+  });
+
   // We set the CORS origin to * so that we don't need to
   // worry about the complexities of CORS this lesson. It's
   // something that will be covered in the next course.
