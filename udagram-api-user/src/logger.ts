@@ -1,4 +1,7 @@
+import { randomUUID } from 'crypto';
+
 const SERVICE = 'backend-user';
+const instanceId = randomUUID();
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
 
@@ -7,6 +10,7 @@ function log(level: LogLevel, message: string, meta?: Record<string, unknown>): 
     timestamp: new Date().toISOString(),
     level,
     service: SERVICE,
+    uuid: instanceId,
     message,
     ...meta,
   };
